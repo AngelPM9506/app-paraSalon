@@ -101,10 +101,12 @@ function paginaAnterior(){
 }
 async function consultarAPI() {
     const server = window.location.origin;
+    console.log(server);
     try {
         const url = `${server}/api/servicios`;
         const resultado = await fetch(url);
         const servicios = await resultado.json();
+        console.log(servicios);
         mostrarServicios(servicios);
     } catch (error) {
         console.error(error.message);
@@ -133,6 +135,7 @@ function mostrarServicios(servicios) {
         /**incrustacion en el html principal**/
         document.querySelector('#servicios').appendChild(servicioDiv);
     });
+    return servicios;
 }
 function seleccionarServicio(servicio) {
     const { id, precio } = servicio;
