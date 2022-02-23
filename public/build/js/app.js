@@ -135,7 +135,6 @@ function mostrarServicios(servicios) {
         /**incrustacion en el html principal**/
         document.querySelector('#servicios').appendChild(servicioDiv);
     });
-    return servicios;
 }
 function seleccionarServicio(servicio) {
     const { id, precio } = servicio;
