@@ -1,1 +1,336 @@
-let paso=1,total=0;const pasoInicial=1,pasoFinal=3,cita={id:"",nombre:"",fecha:"",hora:"",servicios:[]};function iniciarApp(){mostrarSeccion(),tabs(),botonesPaginador(),paginaSiguiente(),paginaAnterior(),consultarAPI(),nombreCliente(),seleccionarFecha(),seleccionarHora(),mostrarResumen()}function mostrarSeccion(){const e=document.querySelector(".mostrar");e&&e.classList.remove("mostrar");const t="#paso-"+paso;document.querySelector(t).classList.add("mostrar");const o=document.querySelector(".actual");o&&o.classList.remove("actual");document.querySelector(`[data-paso="${paso}"]`).classList.add("actual")}function tabs(){document.querySelectorAll(".tabs button").forEach(e=>{e.addEventListener("click",(function(e){paso=parseInt(e.target.dataset.paso),mostrarSeccion(),botonesPaginador()}))})}function botonesPaginador(){const e=document.querySelector("#siguiente"),t=document.querySelector("#anterior");1===paso?(t.classList.add("ocultar"),e.classList.remove("ocultar")):3===paso?(t.classList.remove("ocultar"),e.classList.add("ocultar"),mostrarResumen()):(t.classList.remove("ocultar"),e.classList.remove("ocultar")),mostrarSeccion()}function paginaSiguiente(){document.querySelector("#anterior").addEventListener("click",(function(){paso<=1||(paso--,botonesPaginador())}))}function paginaAnterior(){document.querySelector("#siguiente").addEventListener("click",(function(){paso>=3||(paso++,botonesPaginador())}))}async function consultarAPI(){const e=window.location.origin;try{const t=e+"/api/servicios",o=await fetch(t);mostrarServicios(await o.json())}catch(e){console.log(e)}}function mostrarServicios(e){e.forEach(e=>{const{id:t,nombre:o,precio:a}=e,n=document.createElement("P");n.classList.add("nombre-servicio"),n.textContent=o;const r=document.createElement("P");r.classList.add("precio-servicio"),r.textContent=`$${a} MXN`;const c=document.createElement("DIV");c.classList.add("servicio"),c.dataset.idServicio=t,c.onclick=()=>{seleccionarServicio(e)},c.appendChild(n),c.appendChild(r),document.querySelector("#servicios").appendChild(c)})}function seleccionarServicio(e){const{id:t,precio:o}=e,{servicios:a}=cita,n=document.querySelector(`[data-id-servicio = "${t}"]`);a.some(e=>e.id===t)?(cita.servicios=a.filter(e=>e.id!==t),n.classList.remove("seleccionado"),total-=parseFloat(o)):(cita.servicios=[...a,e],n.classList.add("seleccionado"),total+=parseFloat(o))}function nombreCliente(){cita.nombre=document.querySelector("#nombre").value,cita.id=document.querySelector("#id").value}function seleccionarFecha(){document.querySelector("#fecha").addEventListener("input",e=>{const t=new Date(e.target.value).getUTCDay(),o=new Date;if([6,0].includes(t))e.target.value="",mostrarAlerta("error","Los fines de semana no estan permitidos",".formulario");else{if(e.target.value<o.toISOString().split("T")[0])return mostrarAlerta("error","Introduce una fecha valida",".formulario"),void(e.target.value="");cita.fecha=e.target.value}})}function seleccionarHora(){document.querySelector("#hora").addEventListener("input",e=>{const t=e.target.value.split(":")[0];t<10||t>=18?(e.target.value="",mostrarAlerta("error","Horas no validas, nuestro horario es de 10:00 a 18:00",".formulario")):cita.hora=e.target.value})}function mostrarAlerta(e,t,o,a=!0){const n=document.querySelector(".alerta");n&&n.remove();const r=document.createElement("DIV");r.textContent=t,r.classList.add("alerta"),r.classList.add(e);document.querySelector(o).appendChild(r),a&&setTimeout(()=>{r.remove()},5e3)}function mostrarResumen(){const e=document.querySelector(".contenido-resumen");for(;e.firstChild;)e.removeChild(e.firstChild);if(Object.values(cita).includes("")||0===cita.servicios.length)return void mostrarAlerta("error","no seleccionaste un servicio o falta la fecha u hora, intenta de nuevo.",".contenido-resumen",!1);const{nombre:t,fecha:o,hora:a,servicios:n}=cita,r=document.createElement("H3");r.textContent="Resumen De Servicios";const c=document.createElement("H3");c.textContent="Resumen De Cita";const i=document.createElement("P");i.innerHTML="<span>Nombre:</span> "+t;const s=formateoFecha(o),d=document.createElement("P");d.innerHTML="<span>Fecha:</span> "+s;const l=document.createElement("P");l.innerHTML=`<span>Hora:</span> ${a} Horas`;const u=document.createElement("DIV");u.classList.add("datos-cita"),u.appendChild(c),u.appendChild(i),u.appendChild(d),u.appendChild(l),e.appendChild(r),n.forEach(t=>{const{id:o,nombre:a,precio:n}=t,r=document.createElement("DIV");r.classList.add("contenedor-servicio");const c=document.createElement("P");c.textContent=a;const i=document.createElement("P");i.innerHTML="<span>Precio:</span> $"+n,i.classList.add("preocio-servicio"),r.appendChild(c),r.appendChild(i),e.appendChild(r)});const m=document.createElement("DIV"),p=document.createElement("P");p.innerHTML=`<span>Total:</span> $${total}.00`,m.appendChild(p),m.classList.add("contenedor-total"),e.appendChild(m),e.appendChild(u);const v=document.createElement("BUTTON");v.textContent="Reservar cita",v.classList.add("boton"),v.onclick=reservarCita,e.appendChild(v)}async function reservarCita(){const{id:e,nombre:t,fecha:o,hora:a,servicios:n}=cita,r=n.map(e=>e.id),c=new FormData;c.append("usuarioId",e),c.append("fecha",o),c.append("hora",a),c.append("servicios",r);const i=window.location.origin;try{const e=i+"/api/servicios",t=await fetch(e,{method:"POST",body:c});(await t.json()).resultado&&Swal.fire({icon:"success",title:"Cita Creada",text:"Muy bien tu cita fue guardada exitosamente",button:"ok"}).then(()=>{setTimeout(()=>{window.location.reload()},150)})}catch(e){Swal.fire({icon:"error",title:"¡¡¡Error!!!",text:"Error al guardar la cita",footer:'<a href="">Why do I have this issue?</a>'})}}function formateoFecha(e){const t=new Date(e),o=t.getMonth(),a=t.getDate()+2,n=t.getFullYear();return new Date(Date.UTC(n,o,a)).toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}document.addEventListener("DOMContentLoaded",(function(){iniciarApp()}));
+let paso = 1;
+let total = 0;
+const pasoInicial = 1;
+const pasoFinal = 3;
+const cita = {
+    id :'',
+    nombre: '',
+    fecha: '', 
+    hora: '',
+    servicios: []
+}
+document.addEventListener('DOMContentLoaded', function () {
+    iniciarApp();
+});
+
+function iniciarApp() {
+    mostrarSeccion(); /**Mustra y oculata las secciones**/
+    tabs(); /**Cambiar la seccion cuando se presionen los tobas**/
+    botonesPaginador() /**Agrega o quita los botones del paginador**/
+    /**Acciones dde los botones del paginador**/
+    paginaSiguiente();/**Ir a la página siguiente**/
+    paginaAnterior();/**Ir a la página anterior**/
+    consultarAPI();/**Consulta la API en el backend de php**/
+    nombreCliente();/**Añade el nombre y id del cliente al objeto de cita**/
+    seleccionarFecha(); /**Añade la fecha de la cita al objeto cita**/
+    seleccionarHora();/**Añade la hora de la cita al onjeto cita**/
+    mostrarResumen(); /**Muestra el resumen de la cita**/
+}
+/**Mostrar la seccion dependiendo del nuero de paso**/
+function mostrarSeccion() {
+    /**Ocualtar la seccion que tenga la clase de mostrar**/
+    const seccionAnterior = document.querySelector('.mostrar');
+    if (seccionAnterior) {
+        seccionAnterior.classList.remove('mostrar');
+    }
+
+    /**Seleccionar la seccion con el paso**/
+    const pasoSelector = `#paso-${paso}`;
+    const seccion = document.querySelector(pasoSelector);
+    seccion.classList.add('mostrar');
+
+    /**quitar la clase de actual al anterior**/
+    const tabActual = document.querySelector('.actual');
+    if (tabActual) {
+        tabActual.classList.remove('actual');
+    }
+
+    /**Resalta la etapa actual**/
+    const tab = document.querySelector(`[data-paso="${paso}"]`);
+    tab.classList.add('actual');
+}
+/**Funcion para navegar por los tabs**/
+function tabs() {
+    const botones = document.querySelectorAll('.tabs button');    
+    botones.forEach( boton => {
+        boton.addEventListener('click', function (e) {
+            paso = parseInt(e.target.dataset.paso); 
+            /**Mostrar secciones**/
+            mostrarSeccion();
+            /**Cambiar orden de los botones**/
+            botonesPaginador();
+        });
+    });
+}
+/**Mostrar los botones de paginacion **/
+function botonesPaginador() {
+    const paginaSiguiente = document.querySelector('#siguiente');
+    const paginaAnterior = document.querySelector('#anterior');
+    if (paso === 1) {
+        paginaAnterior.classList.add('ocultar');
+        paginaSiguiente.classList.remove('ocultar')
+    }else if (paso === 3){
+        paginaAnterior.classList.remove('ocultar');
+        paginaSiguiente.classList.add('ocultar');
+        mostrarResumen();
+    }else{
+        paginaAnterior.classList.remove('ocultar');
+        paginaSiguiente.classList.remove('ocultar');
+    }
+    mostrarSeccion();
+}
+function paginaSiguiente(){
+    const paginaAnterior = document.querySelector('#anterior');
+    paginaAnterior.addEventListener('click', function () {
+        if (paso <= pasoInicial ) {
+            return
+        }
+        paso--;
+        botonesPaginador();
+    });
+}
+function paginaAnterior(){
+    const paginaSiguiente = document.querySelector('#siguiente');
+    paginaSiguiente.addEventListener('click', function () {
+        if (paso >= pasoFinal ) {
+            return
+        }
+        paso++;
+        botonesPaginador();
+    });
+}
+async function consultarAPI() {
+    const server = window.location.origin;
+    try {
+        const url = `${server}/api/servicios`;
+        const resultado = await fetch(url);
+        const servicios = await resultado.json();
+        mostrarServicios(servicios);
+    } catch (error) {
+        console.log(error);
+    }
+}
+function mostrarServicios(servicios) {
+    servicios.forEach(servicio => {
+        const{id, nombre, precio} = servicio;
+        /**Nombre de servicio**/
+        const nombreServicio = document.createElement('P');
+        nombreServicio.classList.add('nombre-servicio');
+        nombreServicio.textContent = nombre;
+        /**Precio de servicio**/
+        const precioServicio = document.createElement('P');
+        precioServicio.classList.add('precio-servicio');
+        precioServicio.textContent = `$${precio} MXN`;
+        /**Contenedor de los demas**/
+        const servicioDiv = document.createElement('DIV');
+        servicioDiv.classList.add('servicio');
+        servicioDiv.dataset.idServicio = id;
+        servicioDiv.onclick = () => {seleccionarServicio(servicio)};
+        /**Agregar los demas componentes al div de servicio**/
+        servicioDiv.appendChild(nombreServicio);
+        servicioDiv.appendChild(precioServicio);
+        /**incrustacion en el html principal**/
+        document.querySelector('#servicios').appendChild(servicioDiv);
+    });
+}
+function seleccionarServicio(servicio) {
+    const { id, precio } = servicio;
+    const { servicios } = cita;
+    const divServicio = document.querySelector(`[data-id-servicio = "${id}"]`);
+    /**Comprobar si un servicio ya fue agregado**/
+    if ( servicios.some(agregado => agregado.id === id) ) {
+        /**eliminarlo**/
+        cita.servicios = servicios.filter( agregado => agregado.id !== id);
+        divServicio.classList.remove('seleccionado');
+        total -= parseFloat(precio);
+        //console.log(total);
+    }else{
+        /**agregarlo**/
+        cita.servicios = [...servicios, servicio];
+        divServicio.classList.add('seleccionado');
+        total += parseFloat(precio);
+        //console.log(total);
+    }
+    //console.log(cita);
+}
+function nombreCliente(){
+    cita.nombre = document.querySelector('#nombre').value;
+    cita.id = document.querySelector('#id').value
+}
+function seleccionarFecha() {
+    const inputFecha = document.querySelector('#fecha');
+    inputFecha.addEventListener('input',(e)=>{
+        const dia = new Date(e.target.value).getUTCDay();
+        const hoy = new Date();
+        if ([6, 0].includes(dia)) {
+            e.target.value = '';
+            mostrarAlerta('error','Los fines de semana no estan permitidos','.formulario');
+        }else{
+            /**No registrar nada si alteran el min del html**/
+            if (e.target.value < hoy.toISOString().split('T')[0]) {
+                mostrarAlerta('error','Introduce una fecha valida','.formulario');
+                e.target.value = '';
+                return;
+            }else{
+                cita.fecha = e.target.value;
+            }
+        }
+    });
+}
+function seleccionarHora() {
+    const inputHora = document.querySelector('#hora');
+    inputHora.addEventListener('input',(e)=>{
+        const horaCita = e.target.value;
+        const hora = horaCita.split(":")[0];
+        if (hora<10 || hora>=18) {
+            e.target.value = '';
+            mostrarAlerta('error','Horas no validas, nuestro horario es de 10:00 a 18:00','.formulario');
+        }else{
+            /**por hacer, hacer que solo se permita una cita cada cierta hora**/
+            cita.hora = e.target.value;
+        }
+    });
+}
+function mostrarAlerta(tipo, mensaje, elemento, desaparece = true) {
+    /**Previene que se genere mas de una alerta**/
+    const alertaPrevia = document.querySelector('.alerta');
+    if (alertaPrevia) {
+        alertaPrevia.remove();
+    }
+    /**script para cerar una alerta**/
+    const alerta = document.createElement('DIV');
+    alerta.textContent = mensaje;
+    alerta.classList.add('alerta');
+    alerta.classList.add(tipo);
+    /**mostrar la alerta en el parrafo**/
+    const mostrar = document.querySelector(elemento);
+    mostrar.appendChild(alerta);
+    /**remover la alerta despues de 5s**/
+    if (desaparece) {        
+        setTimeout(()=>{alerta.remove()},5000);
+    }
+}
+function mostrarResumen() {
+    const resumen = document.querySelector('.contenido-resumen');
+    /**Limpiar el contenido de resumen**/
+    while (resumen.firstChild) {
+        resumen.removeChild(resumen.firstChild);
+    }
+    if (Object.values(cita).includes('') || cita.servicios.length === 0) {
+        mostrarAlerta('error','no seleccionaste un servicio o falta la fecha u hora, intenta de nuevo.','.contenido-resumen', false);
+        return;
+    }
+    /**Formatear el div de resumen**/
+    const { nombre, fecha, hora, servicios } = cita;
+    /**heading de servicios**/
+    const headingServicios = document.createElement('H3');
+    headingServicios.textContent = 'Resumen De Servicios';
+    /**heading de Datos citas**/
+    const headingCita = document.createElement('H3');
+    headingCita.textContent = 'Resumen De Cita';
+    /**Nombre**/
+    const nombreCliente = document.createElement('P');
+    nombreCliente.innerHTML = `<span>Nombre:</span> ${nombre}`;
+    /**Fecha**/
+        /**formater la fecha en español**/
+        const fechaFormateada = formateoFecha(fecha);
+    const fechaCita = document.createElement('P');
+    fechaCita.innerHTML = `<span>Fecha:</span> ${fechaFormateada}`;
+    /**Hora**/
+    const horaCita = document.createElement('P');
+    horaCita.innerHTML = `<span>Hora:</span> ${hora} Horas`;
+    /**Div para contenido de datos de la cita**/
+    const datosCita = document.createElement('DIV');
+    datosCita.classList.add('datos-cita');
+    datosCita.appendChild(headingCita);
+    datosCita.appendChild(nombreCliente);
+    datosCita.appendChild(fechaCita);
+    datosCita.appendChild(horaCita);
+    /**Se agregan al resumen los elementos creados enterior mente**/
+    resumen.appendChild(headingServicios);
+    /**Servicios**/
+    servicios.forEach(servicio=>{
+        const { id, nombre, precio } = servicio;
+
+        const contenedorServicio = document.createElement('DIV');
+        contenedorServicio.classList.add('contenedor-servicio');
+
+        const textoServicio = document.createElement('P');
+        textoServicio.textContent = nombre;
+
+        const precioServicio = document.createElement('P');
+        precioServicio.innerHTML = `<span>Precio:</span> $${precio}`;
+        precioServicio.classList.add('preocio-servicio');
+
+        contenedorServicio.appendChild(textoServicio);
+        contenedorServicio.appendChild(precioServicio);
+        resumen.appendChild(contenedorServicio);
+    });
+    /**Agregar total**/
+    const contenedorTotal = document.createElement('DIV');
+    const textoTotal = document.createElement('P');
+    textoTotal.innerHTML = `<span>Total:</span> $${total}.00`;
+    contenedorTotal.appendChild(textoTotal);
+    contenedorTotal.classList.add('contenedor-total');
+    /**se agrega el total al resumen**/
+    resumen.appendChild(contenedorTotal);
+    /**Se agregan los datos de la cista hasta el final */
+    resumen.appendChild(datosCita);
+    /**Boton para crear una ciata**/
+    const botonReserva = document.createElement('BUTTON');
+    botonReserva.textContent = 'Reservar cita';
+    botonReserva.classList.add('boton');
+    botonReserva.onclick = reservarCita;
+    resumen.appendChild(botonReserva);
+}
+/**Reservar cita**/
+async function reservarCita() {
+    const { id, nombre, fecha, hora, servicios} = cita; 
+    const idServicios = servicios.map(servicio => servicio.id);
+    const datos = new FormData();
+    datos.append('usuarioId', id);
+    datos.append('fecha', fecha);
+    datos.append('hora', hora);
+    datos.append('servicios', idServicios);
+    const server = window.location.origin;
+    try {
+        /**peticion hacia la api**/
+        const url = `${server}/api/servicios`;
+        const respuesta = await fetch(url, {
+            method: 'POST',
+            body: datos
+        });
+        const resultado = await respuesta.json();
+        if (resultado.resultado) {
+            Swal.fire({
+            icon: 'success',
+            title: 'Cita Creada',
+            text: 'Muy bien tu cita fue guardada exitosamente',
+            button: 'ok'
+          }).then(()=>{
+              setTimeout(()=>{
+                window.location.reload();
+              }, 150);
+          });
+        }        
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: '¡¡¡Error!!!',
+            text: 'Error al guardar la cita',
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+    }
+    //console.log([...datos]);
+}
+/**Formatear fecha**/
+function formateoFecha(fecha) {
+    const fechaObj = new Date(fecha);
+    const mes = fechaObj.getMonth();
+    const dia = fechaObj.getDate() + 2;
+    const year = fechaObj.getFullYear();
+    const fechaUTC = new Date(Date.UTC(year,mes,dia));
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const fechaFormateada = fechaUTC.toLocaleDateString('es-MX', opciones);
+    return fechaFormateada;
+}
