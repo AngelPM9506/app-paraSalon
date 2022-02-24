@@ -30,11 +30,13 @@ class Router
 
         $currentUrl = $_SERVER['REQUEST_URI'] === '' ? '/' : $_SERVER['REQUEST_URI'];
         $method = $_SERVER['REQUEST_METHOD'];
-
+        /**dividir la url actual cada vez que exista un ? para indicar que se estan enviando datos  por la url */
+        $splitURL = explode('?', $currentUrl);
         if ($method === 'GET') {
-            $fn = $this->getRoutes[$currentUrl] ?? null;
+            //$fn = $this->getRoutes[$currentUrl] ?? null;
+            $fn = $this->getRoutes[$splitURL[0]] ?? null; /**$splitURL contiene la url sin variables */
         } else {
-            $fn = $this->postRoutes[$currentUrl] ?? null;
+            $fn = $this->postRoutes[$splitURL[0]] ?? null;
         }
 
 
