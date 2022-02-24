@@ -12,8 +12,8 @@ class APIController{
         //phpinfo();
         //$listados = json_encode($servicios);
         //debuguear($listados);
-        //echo json_encode($servicios);
-        echo $servicios;
+        echo json_encode($servicios);
+        //echo $servicios;
     }
     public static function registrar(){
         /**Almacena la cita y debualve el Id**/
