@@ -10,9 +10,10 @@ class APIController{
     public static function index(){
         $servicios = Servicio::all();
         //phpinfo();
-        $listados = json_encode($servicios);
-        debuguear($listados);
-        echo json_encode($servicios);
+        //$listados = json_encode($servicios);
+        //debuguear($listados);
+        //echo json_encode($servicios);
+        echo $servicios;
     }
     public static function registrar(){
         /**Almacena la cita y debualve el Id**/
