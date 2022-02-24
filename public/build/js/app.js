@@ -101,14 +101,14 @@ function paginaAnterior(){
 }
 async function consultarAPI() {
     const server = window.location.origin;
-    console.log(server);
+    //console.log(server);
     try {
         const url = `${server}/api/servicios`;
-        console.log(url);
+        //console.log(url);
         const resultado = await fetch(url);
-        console.log(fetch(url));
+        //console.log(fetch(url));
         const servicios = await resultado.json();
-        console.log(servicios);
+        ///console.log(servicios);
         mostrarServicios(servicios);
     } catch (error) {
         console.error(error.message);

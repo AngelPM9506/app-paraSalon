@@ -11,7 +11,7 @@ class APIController{
         $servicios = Servicio::all();
         //phpinfo();
         //$listados = json_encode($servicios);
-        //debuguear($listados);
+        debuguear($servicios);
         echo json_encode($servicios);
         //echo $servicios;
     }
