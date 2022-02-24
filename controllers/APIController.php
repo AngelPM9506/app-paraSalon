@@ -10,7 +10,7 @@ class APIController{
     public static function index(){
         $servicios = Servicio::all();
         //phpinfo();
-        debuguear(json_encode($servicios,6));
+        debuguear(json_encode(Servicio::all()));
         echo json_encode($servicios);
     }
     public static function registrar(){
