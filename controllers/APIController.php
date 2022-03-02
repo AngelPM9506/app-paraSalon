@@ -9,7 +9,7 @@ use Model\Servicio;
 class APIController{
     public static function index(){
         $servicios = Servicio::all();
-        debuguear(json_encode($servicios, JSON_UNESCAPED_UNICODE));
+        debuguear(json_encode($servicios, JSON_PRESERVE_ZERO_FRACTION+JSON_UNESCAPED_UNICODE));
         echo json_encode($servicios, JSON_UNESCAPED_UNICODE);
     }
     public static function registrar(){
