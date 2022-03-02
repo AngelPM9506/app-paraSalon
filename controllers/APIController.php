@@ -9,8 +9,8 @@ use Model\Servicio;
 class APIController{
     public static function index(){
         $servicios = Servicio::all();
-        debuguear(json_encode($servicios, JSON_UNESCAPED_SLASHES));
-        echo json_encode($servicios, JSON_UNESCAPED_UNICODE);
+        debuguear(json_encode($servicios, JSON_ERROR_UTF8));
+        echo json_encode($servicios, JSON_ERROR_UTF8);
     }
     public static function registrar(){
         /**Almacena la cita y debualve el Id**/
