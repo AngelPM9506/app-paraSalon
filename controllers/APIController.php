@@ -9,7 +9,12 @@ use Model\Servicio;
 class APIController{
     public static function index(){
         $servicios = Servicio::all();
-        echo json_encode( (object) $servicios, JSON_PRESERVE_ZERO_FRACTION+JSON_UNESCAPED_UNICODE);
+        $json = json_encode( (object) $servicios, JSON_PRESERVE_ZERO_FRACTION+JSON_UNESCAPED_UNICODE);
+        if ($json) {
+            echo $json;
+        }else{
+            echo 'Sin resultados';
+        }
     }
     public static function registrar(){
         /**Almacena la cita y debualve el Id**/
