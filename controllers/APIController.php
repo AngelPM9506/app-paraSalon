@@ -9,7 +9,7 @@ use Model\Servicio;
 class APIController{
     public static function index(){
         $servicios = Servicio::all();
-        $json = json_encode( (object) $servicios, JSON_PRESERVE_ZERO_FRACTION+JSON_UNESCAPED_UNICODE);
+        $json = json_encode( (object) $servicios, JSON_UNESCAPED_UNICODE);
         if ($json) {
             echo $json;
         }else{
