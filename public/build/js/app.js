@@ -316,11 +316,10 @@ async function reservarCita() {
           });
         }        
     } catch (error) {
-        console.log(error.message);
         Swal.fire({
             icon: 'error',
             title: '¡¡¡Error!!!',
-            text: error,
+            text: 'Error, no se realizó la cita',
             footer: '<a href="">Why do I have this issue?</a>'
           });
     }
