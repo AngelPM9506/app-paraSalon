@@ -316,7 +316,7 @@ async function reservarCita() {
           });
         }        
     } catch (error) {
-        console.log(error);
+        console.log(error.message);
         Swal.fire({
             icon: 'error',
             title: '¡¡¡Error!!!',
