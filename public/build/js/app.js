@@ -287,17 +287,17 @@ function mostrarResumen() {
 }
 /**Reservar cita**/
 async function reservarCita() {
-    const { id, nombre, fecha, hora, servicios} = cita; 
+    const { id, fecha, hora, servicios} = cita; 
     const idServicios = servicios.map(servicio => servicio.id);
     const datos = new FormData();
+    const server = window.location.origin;
     datos.append('usuarioId', id);
     datos.append('fecha', fecha);
     datos.append('hora', hora);
     datos.append('servicios', idServicios);
-    const server = window.location.origin;
     try {
         /**peticion hacia la api**/
-        const url = `${server}/api/servicios`;
+        const url = `${server}/api/citas`;
         const respuesta = await fetch(url, {
             method: 'POST',
             body: datos
